@@ -1,8 +1,25 @@
-FROM alpine
+# FROM alpine
+# Use the official Python image as a base image
+FROM python:3.12.2-alpine
 
-RUN addgroup -S mercari && adduser -S trainee -G mercari
-# RUN chown -R trainee:mercari /path/to/db
+# Set the working directory inside the container
+WORKDIR /app
 
-USER trainee
+# Copy the requirements file into the container at /app
+COPY requirements.txt requirements.txt
 
-CMD ["python", "-V"]
+# Install any dependencies specified in requirements.txt
+RUN pip3 install -r requirements.txt
+
+RUN apt update && apt install -y curl
+
+# Copy the rest of the application code into the container at /app
+COPY . .
+
+# Expose port 9000 to the outside world
+EXPOSE 9000
+
+# Specify the command to run on container start
+# CMD [ "python", "-V" ]
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.1", "--port", "9000"]
